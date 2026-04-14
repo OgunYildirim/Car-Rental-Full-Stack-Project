@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     environment {
         // Environment variables
         DB_CONTAINER_NAME = "car_rental_db"
@@ -14,7 +18,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out code from Git...'
-                git branch: 'main', url: 'https://github.com/akadirdgn/Car-Rental-Full-Stack-Project.git' // Replace with your repo
+                git branch: 'main', url: 'https://github.com/OgunYildirim/Car-Rental-Full-Stack-Project.git' // Replace with your repo
             }
         }
 
@@ -114,6 +118,23 @@ pipeline {
             post {
                 always {
                      junit 'automation-tests/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Expose to Internet with Ngrok') {
+            steps {
+                echo 'Starting Ngrok on port 3000...'
+                // Eski ngrok işlemlerini kapat
+                bat 'taskkill /F /IM ngrok.exe || exit 0'
+                // Ngrok'u arka planda başlat (3000 portu frontend için docker-compose'da map edilmiş)
+                bat 'start /b ngrok http 3000 > ngrok.log'
+                // Başlaması için kısa bir süre bekle
+                sleep time: 10, unit: 'SECONDS'
+                // ngrok API'sinden atanan geçici public URL'i al ekrana yazdır
+                script {
+                    def ngrokUrl = powershell(script: "(Invoke-RestMethod -Uri 'http://localhost:4040/api/tunnels').tunnels[0].public_url", returnStdout: true).trim()
+                    echo "Uygulamanız geçici olarak internete açıldı. Adres: ${ngrokUrl}"
                 }
             }
         }
