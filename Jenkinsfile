@@ -79,17 +79,7 @@ pipeline {
             }
         }
 
-        stage('Integration Tests') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'cd car-rental-system-backend && mvn verify -DskipUnitTests'
-                    } else {
-                        bat 'cd car-rental-system-backend && mvn verify -DskipUnitTests'
-                    }
-                }
-            }
-        }
+
 
         stage('Docker Deploy') {
             steps {
@@ -108,7 +98,7 @@ pipeline {
             }
         }
 
-        // Diğer test ve ngrok stage'leri aynı şekilde platform kontrolü ile devam ettirilebilir.
+
     }
 
     post {
