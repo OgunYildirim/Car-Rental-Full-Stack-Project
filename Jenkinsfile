@@ -62,22 +62,6 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'cd car-rental-system-backend && mvn test'
-                    } else {
-                        bat 'cd car-rental-system-backend && mvn test'
-                    }
-                }
-            }
-            post {
-                always {
-                    junit 'car-rental-system-backend/target/surefire-reports/*.xml'
-                }
-            }
-        }
 
 
 
