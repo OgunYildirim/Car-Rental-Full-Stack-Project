@@ -82,6 +82,43 @@ pipeline {
             }
         }
 
+        stage('Start ngrok Tunnels') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+# Çalışma dizinine ngrok indirilmemişse indir ve aç
+if ! command -v ngrok >/dev/null 2>&1; then
+  echo "ngrok bulunamadı; workspace içine indiriliyor..."
+  if [ ! -f ngrok ]; then
+    curl -s -L -o ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+    unzip -o ngrok.zip || true
+    chmod +x ngrok || true
+  fi
+fi
+# Frontend ve backend için tünelleri başlat (frontend:3000, backend:8080)
+./ngrok http 3000 --log=stdout > ngrok-frontend.log 2>&1 & echo $! > ngrok-frontend.pid || true
+./ngrok http 8080 --log=stdout > ngrok-backend.log 2>&1 & echo $! > ngrok-backend.pid || true
+sleep 6
+# ngrok'un lokal API'sinden tünel bilgilerini çek
+echo "--- ngrok tunnels (raw JSON) ---"
+curl --silent --fail http://127.0.0.1:4040/api/tunnels || echo "ngrok API erişilemedi veya ngrok başlatılamadı"
+                        '''
+                    } else {
+                        bat '''
+where ngrok >nul 2>&1 || (
+  echo ngrok bulunamadı, lütfen agent'a ngrok kurun. & exit /b 0
+)
+rem Frontend ve backend tünellerini arka planda başlat
+start /B ngrok http 3000 > ngrok-frontend.log 2>&1
+start /B ngrok http 8080 > ngrok-backend.log 2>&1
+timeout /t 6 /nobreak >nul
+powershell -NoProfile -Command "try { Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels | ConvertTo-Json -Depth 5 } catch { Write-Output 'ngrok API erişilemedi veya ngrok başlatılamadı' }"
+                        '''
+                    }
+                }
+            }
+        }
 
     }
 

@@ -84,3 +84,4 @@ The application utilizes a relational database structure designed for integrity 
 
 
 > Not: README üzerinde küçük bir yerel test değişikliği yapıldı; bu değişikliği push edebilirsiniz.
+
