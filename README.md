@@ -81,3 +81,6 @@ The application utilizes a relational database structure designed for integrity 
     - Navigate to `car-rental-system-frontend`.
     - Install dependencies: `npm install`
     - Start app: `npm start`
+
+
+> Not: README üzerinde küçük bir yerel test değişikliği yapıldı; bu değişikliği push edebilirsiniz.
