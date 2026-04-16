@@ -27,7 +27,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/anasayfa" element={<HomePage />} />
         <Route path="/user/admin/register" element={<AdminRegisterForm />} />
         <Route path="/user/login" element={<UserLoginForm />} />
         <Route path="/user/customer/register" element={<UserRegister />} />
